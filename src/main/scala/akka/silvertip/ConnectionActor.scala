@@ -22,6 +22,7 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
   private def attemptToConnect {
     import params._
     logger.debug("SilvertipConnectionFactory#create -->")
+    connection.foreach(_ => listener ! Reconnecting)
     connection = Some(Connection.attemptToConnect(new InetSocketAddress(hostname, port), messageParserFactory.create, 
       new Connection.Callback[T]() {
         def messages(connection: Connection[T], messages: java.util.Iterator[T]) {

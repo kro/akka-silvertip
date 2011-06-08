@@ -3,6 +3,7 @@ package akka.silvertip
 import silvertip.Connection
 
 case object Connect
+case object Reconnecting
 
 case class Disconnected[T](connection: Connection[T])
 case class Connected[T](connection: Connection[T])
