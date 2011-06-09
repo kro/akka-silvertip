@@ -5,7 +5,7 @@ import akka.silvertip._
 import net.lag.logging.Logger
 
 object SimpleClient extends App with SimpleServerClientConfig {
-  val connection = Silvertip.createConnection(new ConnectionParameters(
+  Silvertip.createConnection(new ConnectionParameters(
     new MessageParserFactory[String] {
       def create = new SimpleMessageParser
     },
