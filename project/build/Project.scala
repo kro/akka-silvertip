@@ -7,4 +7,6 @@ class Project(info: ProjectInfo) extends DefaultProject(info) with AkkaProject {
   val configgy = "net.lag" % "configgy" % "2.0.0" intransitive()
   val runSimpleServer = task { args => { runTask(Some("akka.silvertip.test.SimpleServer"), runClasspath, args) }.dependsOn(testCompile) }
   val runSimpleClient = task { args => { runTask(Some("akka.silvertip.test.SimpleClient"), runClasspath, args) }.dependsOn(testCompile) }
+  lazy val publishTo = Resolver.file("GitHub Pages", new java.io.File("../akka-silvertip-gh-pages/maven/"))
+  override def managedStyle = ManagedStyle.Maven
 }
