@@ -10,8 +10,12 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
   private var connection: Option[Connection[T]] = None
   self.faultHandler = OneForOneStrategy(List(classOf[Throwable]))
   self.lifeCycle = Permanent
+  import params._
   def receive: Receive = {
     case Connect => attemptToConnect
+    case message: T => connection.foreach { connection => 
+      listener ! Send(connection, message)
+    }
   }
   override def postRestart(reason: Throwable) {
     attemptToConnect
@@ -20,13 +24,12 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
     disconnect
   }
   private def attemptToConnect {
-    import params._
     logger.debug("SilvertipConnectionFactory#create -->")
     connection.foreach(_ => listener ! Reconnecting)
     connection = Some(Connection.attemptToConnect(new InetSocketAddress(hostname, port), messageParserFactory.create, 
       new Connection.Callback[T]() {
         def messages(connection: Connection[T], messages: java.util.Iterator[T]) {
-          while (messages.hasNext) listener ! (connection, messages.next)
+          while (messages.hasNext) listener ! Recv(connection, messages.next)
         }
         def idle(connection: Connection[T]) { 
           listener ! Idle(connection)
