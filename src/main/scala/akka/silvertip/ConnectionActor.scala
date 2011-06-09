@@ -26,7 +26,7 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
     connection = Some(Connection.attemptToConnect(new InetSocketAddress(hostname, port), messageParserFactory.create, 
       new Connection.Callback[T]() {
         def messages(connection: Connection[T], messages: java.util.Iterator[T]) {
-          while (messages.hasNext) listener ! (messages.next)
+          while (messages.hasNext) listener ! (connection, messages.next)
         }
         def idle(connection: Connection[T]) { 
           listener ! Idle(connection)
