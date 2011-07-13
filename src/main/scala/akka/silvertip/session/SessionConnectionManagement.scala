@@ -45,6 +45,11 @@ trait SessionConnectionManagement[T] extends SessionConnectionConfig { this: Act
                 session.receive(connection, message)
               }
             }
+            case Send(connection: Connection[_], message: Any) => {
+              session.foreach { session =>
+                session.send(connection, message)
+              }
+            }
             case Disconnected(connection: Connection[_]) => {
               if (session.isDefined) self.reply(session.get.delayUntilReconnect) else 0
             }

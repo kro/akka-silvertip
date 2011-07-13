@@ -21,5 +21,6 @@ trait Session {
   def login(connection: Connection[_])
   def keepAlive(connection: Connection[_])
   def receive(connection: Connection[_], message: Any)
+  def send(connection: Connection[_], message: Any)
   def delayUntilReconnect: Int
 }
