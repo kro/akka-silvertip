@@ -21,7 +21,7 @@ import silvertip.{Connection, Message, MessageParser}
 
 case object Start
 
-trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig { this: Actor =>
+trait SessionConnectionManagement[T] extends SessionConnectionConfig { this: Actor =>
   protected var connection: ActorRef = _
   override def preStart { self ! Start }
   protected def sessionConnectionManagement: Receive = {
@@ -58,7 +58,7 @@ trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig {
   def newSession: Session
 }
 
-trait SessionConnectionManagementConfig {
+trait SessionConnectionConfig {
   def hostname: String
   def port: Int
 }
