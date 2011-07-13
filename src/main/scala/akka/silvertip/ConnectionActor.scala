@@ -13,7 +13,7 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
   import params._
   def receive: Receive = {
     case Connect => attemptToConnect
-    case message: T => connection.foreach { connection => 
+    case message => connection.foreach { connection => 
       listener ! Send(connection, message)
     }
   }
