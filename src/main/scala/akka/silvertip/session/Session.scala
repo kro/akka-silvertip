@@ -17,7 +17,7 @@ package akka.silvertip.session
 
 import silvertip.{Connection, Message, MessageParser}
 
-trait Session[T <: Message] {
+trait Session[T] {
   def login(connection: Connection[_])
   def keepAlive(connection: Connection[_])
   def receive(connection: Connection[_], message: Message)

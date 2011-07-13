@@ -21,7 +21,7 @@ import silvertip.{Connection, Message, MessageParser}
 
 case object Start
 
-trait SessionConnectionManagement[T <: Message] extends SessionConnectionManagementConfig { this: Actor =>
+trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig { this: Actor =>
   protected var connection: ActorRef = _
   override def preStart { self ! Start }
   protected def sessionConnectionManagement: Receive = {
