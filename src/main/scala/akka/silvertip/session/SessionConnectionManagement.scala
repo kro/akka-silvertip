@@ -50,7 +50,7 @@ trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig {
             }
             case message: SilvertipMessage => Unit
           }
-        }).start, reconnectDelayMsec, hostname, port
+        }).start, hostname, port
       ))
     }
   }
@@ -61,5 +61,4 @@ trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig {
 trait SessionConnectionManagementConfig {
   def hostname: String
   def port: Int
-  def reconnectDelayMsec: Int
 }
