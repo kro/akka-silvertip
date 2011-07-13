@@ -11,7 +11,7 @@ object SimpleClient extends App with SimpleServerClientConfig {
     },
     Actor.actorOf(new Actor {
       def receive: Receive = { case message => logger.info("Message: %s", message) }
-    }).start, "localhost", serverPort
+    }).start, 0, "localhost", serverPort
   ))
   lazy val logger = Logger.get
 }

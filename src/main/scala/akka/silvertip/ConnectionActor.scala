@@ -35,7 +35,7 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
           listener ! Idle(connection)
         }
         def closed(connection: Connection[T]) {
-          listener ! Disconnected(connection)
+          (listener !! Disconnected(connection)).asInstanceOf[Option[Int]].foreach(Thread.sleep(_))
           self ! Connect
         }
         def garbledMessage(message: String, data: Array[Byte]) { 
@@ -51,7 +51,10 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
     listener ! Connected(connection.get)
   }
   private def disconnect {
-    connection.foreach { connection => if (!connection.isClosed) connection.close }
+    connection.foreach { connection => 
+      if (!connection.isClosed) 
+        connection.close 
+    }
   }
   private def timeoutIntervalMsec = 100
   private def logger = Logger.get
