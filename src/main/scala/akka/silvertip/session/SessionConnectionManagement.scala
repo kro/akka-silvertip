@@ -31,7 +31,7 @@ trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig {
           def create = newMessageParser
         },
         Actor.actorOf(new Actor {
-          var session: Option[Session[T]] = None
+          var session: Option[Session] = None
           def receive: Receive = {
             case Connected(connection) => {
               session = Some(newSession)
@@ -40,7 +40,7 @@ trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig {
             case Idle(connection) => {
               session.foreach(_.keepAlive(connection))
             }
-            case Recv(connection: Connection[_], message: Message) => {
+            case Recv(connection: Connection[_], message: Any) => {
               session.foreach { session =>
                 session.receive(connection, message)
               }
@@ -55,7 +55,7 @@ trait SessionConnectionManagement[T] extends SessionConnectionManagementConfig {
     }
   }
   def newMessageParser: MessageParser[T]
-  def newSession: Session[T]
+  def newSession: Session
 }
 
 trait SessionConnectionManagementConfig {

@@ -15,11 +15,11 @@
  */
 package akka.silvertip.session
 
-import silvertip.{Connection, Message, MessageParser}
+import silvertip.Connection
 
-trait Session[T] {
+trait Session {
   def login(connection: Connection[_])
   def keepAlive(connection: Connection[_])
-  def receive(connection: Connection[_], message: Message)
+  def receive(connection: Connection[_], message: Any)
   def delayUntilReconnect: Int
 }
