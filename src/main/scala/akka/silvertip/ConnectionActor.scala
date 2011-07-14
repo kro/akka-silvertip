@@ -35,8 +35,10 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
           listener ! Idle(connection)
         }
         def closed(connection: Connection[T]) {
-          (listener !! Disconnected(connection)).asInstanceOf[Option[Int]].foreach(Thread.sleep(_))
-          self ! Connect
+          Actor.spawn {
+            (listener !! Disconnected(connection)).asInstanceOf[Option[Int]].foreach(Thread.sleep(_))
+            self ! Connect
+          }
         }
         def garbledMessage(message: String, data: Array[Byte]) { 
           listener ! GarbledMessage(message, data)
