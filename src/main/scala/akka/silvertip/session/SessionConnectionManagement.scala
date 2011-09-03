@@ -33,7 +33,7 @@ trait SessionConnectionManagement[T] extends SessionConnectionConfig { this: Act
   }
   protected def sessionConnectionManagement: Receive = {
     case Start => {
-      val listener = Some(Actor.actorOf(new Actor {
+      listener = Some(Actor.actorOf(new Actor {
         var session: Option[Session] = None
         def receive: Receive = {
           case Connected(connection) => {
