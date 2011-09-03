@@ -22,41 +22,48 @@ import silvertip.{Connection, Message, MessageParser}
 case object Start
 
 trait SessionConnectionManagement[T] extends SessionConnectionConfig { this: Actor =>
-  protected var connection: ActorRef = _
-  override def preStart { self ! Start }
+  protected var connection: Option[ActorRef] = None
+  protected var listener: Option[ActorRef] = None
+  override def preStart { 
+    self ! Start 
+  }
+  override def postStop {
+    connection.foreach(_.stop)
+    listener.foreach(_.stop)
+  }
   protected def sessionConnectionManagement: Receive = {
     case Start => {
-      connection = Silvertip.createConnection(new ConnectionParameters(
+      val listener = Some(Actor.actorOf(new Actor {
+        var session: Option[Session] = None
+        def receive: Receive = {
+          case Connected(connection) => {
+            session = Some(newSession)
+            session.foreach(_.login(connection))
+          }
+          case Idle(connection) => {
+            session.foreach(_.keepAlive(connection))
+          }
+          case Recv(connection: Connection[_], message: Any) => {
+            session.foreach { session =>
+              session.receive(connection, message)
+            }
+          }
+          case Send(connection: Connection[_], message: Any) => {
+            session.foreach { session =>
+              session.send(connection, message)
+            }
+          }
+          case Disconnected(connection: Connection[_]) => {
+            if (session.isDefined) self.reply(session.get.delayUntilReconnect) else 0
+          }
+          case message: SilvertipMessage => Unit
+        }
+      }).start)
+      connection = Some(Silvertip.createConnection(new ConnectionParameters(
         new MessageParserFactory[T] {
           def create = newMessageParser
-        },
-        Actor.actorOf(new Actor {
-          var session: Option[Session] = None
-          def receive: Receive = {
-            case Connected(connection) => {
-              session = Some(newSession)
-              session.foreach(_.login(connection))
-            }
-            case Idle(connection) => {
-              session.foreach(_.keepAlive(connection))
-            }
-            case Recv(connection: Connection[_], message: Any) => {
-              session.foreach { session =>
-                session.receive(connection, message)
-              }
-            }
-            case Send(connection: Connection[_], message: Any) => {
-              session.foreach { session =>
-                session.send(connection, message)
-              }
-            }
-            case Disconnected(connection: Connection[_]) => {
-              if (session.isDefined) self.reply(session.get.delayUntilReconnect) else 0
-            }
-            case message: SilvertipMessage => Unit
-          }
-        }).start, hostname, port
-      ))
+        }, listener.get, hostname, port
+      )))
     }
   }
   def newMessageParser: MessageParser[T]
