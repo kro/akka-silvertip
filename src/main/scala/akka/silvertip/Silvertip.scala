@@ -11,6 +11,14 @@ object Silvertip {
     connection ! Connect
     connection
   }
+  def shutdownAll {
+    import scala.collection.JavaConversions._
+    supervisor.linkedActors.values.foreach  { actor =>
+      actor.stop
+      supervisor.unlink(actor)
+    }
+    supervisor.stop
+  }
   private class SupervisorActor extends Actor {
     self.faultHandler = OneForOneStrategy(List(classOf[Throwable]))
     def receive: Receive = { case _ => Unit }
