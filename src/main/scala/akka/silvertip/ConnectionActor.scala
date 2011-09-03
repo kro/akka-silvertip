@@ -23,6 +23,9 @@ private[silvertip] class ConnectionActor[T](params: ConnectionParameters[T]) ext
   override def preRestart(reason: Throwable) {
     disconnect
   }
+  override def postStop {
+    disconnect
+  }
   private def attemptToConnect {
     logger.debug("SilvertipConnectionFactory#create -->")
     connection.foreach(_ => listener ! Reconnecting)
